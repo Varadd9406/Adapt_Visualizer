@@ -1,0 +1,93 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/UI/Testing/TestSettings.uss?fileID=7433441132597879392&amp;guid=753e25b06de4a4b42b6a58a4676e08f1&amp;type=3#TestSettings" />
+    
+    <engine:VisualElement class="settings-container">
+
+        <engine:Label text="Settings" class="title" />
+        <engine:VisualElement class="tabs-container">
+            <engine:Button text="BASIC" name="basic-tab" class="tab-button active-tab" />
+            <engine:Button text="ADVANCED" name="advanced-tab" class="tab-button" />
+        </engine:VisualElement>
+        <engine:Label text="BASIC SETTINGS" class="settings-group-title" />
+
+        <engine:ScrollView class="scroll-container">
+            <engine:VisualElement class="settings-group">
+                <engine:VisualElement class="setting-row">
+                    <engine:Label text="Example 1" class="setting-label" />
+                    <engine:DropdownField name="fullscreen-dropdown" class="dropdown" />
+                </engine:VisualElement>
+
+                <engine:VisualElement class="setting-row">
+                    <engine:Label text="Example 1" class="setting-label" />
+                    <engine:DropdownField name="device-dropdown" class="dropdown" />
+                </engine:VisualElement>
+
+                <engine:VisualElement class="setting-row">
+                    <engine:Label text="Example 1" class="setting-label" />
+                    <engine:DropdownField name="resolution-dropdown" class="dropdown" />
+                </engine:VisualElement>
+
+                <engine:VisualElement class="setting-row">
+                    <engine:Label text="Example 1" class="setting-label" />
+                    <engine:Slider name="brightness-slider" class="unity-slider" />
+                </engine:VisualElement>
+
+                <engine:VisualElement class="setting-row">
+                    <engine:Label text="Example 1" class="setting-label" />
+                    <engine:Slider name="field-of-view-slider" class="unity-slider" />
+                </engine:VisualElement>
+
+                <engine:VisualElement class="setting-row">
+                    <engine:Label text="Example 1" class="setting-label" />
+                    <engine:Slider name="vehicle-fov-slider" class="unity-slider" />
+                </engine:VisualElement>
+
+                <engine:VisualElement class="setting-row">
+                    <engine:Label text="Example 1" class="setting-label" />
+                    <engine:Toggle name="the-uxml-field" />
+                </engine:VisualElement>
+
+                <engine:VisualElement class="setting-row">
+                    <engine:Label text="Example 1" class="setting-label" />
+                    <engine:Slider name="motion-blur-slider" class="unity-slider" />
+                </engine:VisualElement>
+
+                <engine:VisualElement class="setting-row">
+                    <engine:Label text="Example 1" class="setting-label" />
+                 <engine:TextField
+                        name="myInputField"
+                        max-length="50"
+                        class="custom-input" />                
+                </engine:VisualElement>
+
+                <engine:VisualElement class="setting-row">
+                    <engine:Label text="Example 1" class="setting-label" />
+                    <engine:DropdownField name="color-settings-dropdown" class="dropdown" />
+                </engine:VisualElement>
+
+                <engine:VisualElement class="setting-row">
+                    <engine:Label text="Example 1" class="setting-label" />
+                    <engine:toggle text="OFF" name="chromatic-aberration-toggle" class="toggle-button" />
+                </engine:VisualElement>
+
+                <engine:VisualElement class="setting-row">
+                    <engine:Label text="Example 1" class="setting-label" />
+                    <engine:Button text="OFF" name="film-grain-toggle" class="toggle-button" />
+                </engine:VisualElement>
+
+                <engine:VisualElement class="setting-row">
+                    <engine:Label text="Example 1" class="setting-label" />
+                    <engine:Button text="OFF" name="vignette-toggle" class="toggle-button" />
+                </engine:VisualElement>
+
+                <engine:VisualElement class="setting-row">
+                    <engine:Label text="Example 1" class="setting-label" />
+                    <engine:Button text="OFF" name="lens-distortion-toggle" class="toggle-button" />
+                </engine:VisualElement>
+
+            </engine:VisualElement>
+         </engine:ScrollView>
+
+    </engine:VisualElement>
+
+</engine:UXML>

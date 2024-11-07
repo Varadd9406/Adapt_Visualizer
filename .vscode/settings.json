@@ -56,5 +56,5 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "Adapt.sln"
+    "dotnet.defaultSolution": "Adapt_Visualizer.sln"
 }

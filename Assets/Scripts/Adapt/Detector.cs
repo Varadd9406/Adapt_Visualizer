@@ -84,6 +84,7 @@ public class Detector : MonoBehaviour
 		Debug.Log(fiberData.Count);
 		sr.Close();
 	}
+	
 	void ReadGammaRayData(string filepath)
 	{
 		StreamReader sr = new StreamReader(filepath);
@@ -132,6 +133,7 @@ public class Detector : MonoBehaviour
 		Debug.Log(coneData.Count);
 		sr.Close();
 	}
+	
 	void SetEvent(int idx)
 	{
 		for(int i = 0;i<fiberData[idx].Count;i++)
