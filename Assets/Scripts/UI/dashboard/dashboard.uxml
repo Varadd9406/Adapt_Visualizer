@@ -3,26 +3,7 @@
 
 	<engine:VisualElement class="container">
 		<engine:VisualElement class="grid-view">
-			<!-- Launch Vehicle Section -->
-			<engine:VisualElement class="section launch-vehicle">
-				<engine:Label text="Launch Vehicle" class="section-title" />
-				<engine:Image class="rocket-image" />
-				<engine:Label text="Falcon Heavy | ArabSat 6A" class="launch-info" />
-				<engine:Label text="SpaceX" class="company-name" />
-				<engine:Label text="Sun Apr 07, 2019 22:36 UTC" class="launch-date" />
-			</engine:VisualElement>
 
-			<!-- Satellite Trajectory/Location Section -->
-			<engine:VisualElement class="section satellite-trajectory">
-				<engine:Label text="Satellite Trajectory/Location" class="section-title" />
-				<engine:Image class="trajectory-map" />
-				<engine:Label text="Lat : 54.341579" class="trajectory-info" />
-				<engine:Label text="Long : -1.435360" class="trajectory-info" />
-				<engine:Label text="Alt : 256,000m" class="trajectory-info" />
-				<engine:Label text="Velocity : 25,555km/h" class="trajectory-info" />
-			</engine:VisualElement>
-
-			<!-- Mission Clock/Countdown Clock Section -->
 			<engine:VisualElement class="section mission-clock">
 				<engine:Label text="Mission Clock/Countdown Clock" class="section-title" />
 				<engine:Label text="Countdown" class="countdown-title" />
@@ -32,33 +13,64 @@
 			</engine:VisualElement>
 
 
-			<!-- Sensor Detail Section -->
-			<engine:VisualElement class="section sensor-detail">
-				<engine:Label text="Sensor Detail" class="section-title" />
-					<custom:RadialProgress progress="12" class="sensor"/>
-					<custom:Odometer value="23" class="sensor"/>
-					<custom:Indicator state="true" class="sensor"/>
+			<engine:VisualElement name="telemetry" class="section">
+                <engine:Label text="Telemetry Links" class="section-title" />
+                <engine:VisualElement class="data-group">
+                    <engine:Label text="Starlink" class="status-label" />
+                    <custom:Indicator name="starlink-status" state="true" />
+                </engine:VisualElement>
+                <engine:VisualElement class="data-group">
+                    <engine:Label text="TDRSS" class="status-label" />
+                    <custom:Indicator name="tdrss-status" state="true" />
+                </engine:VisualElement>
+                <engine:VisualElement class="data-group">
+                    <engine:Label text="OpenPort" class="status-label" />
+                    <custom:Indicator name="openport-status" state="false" />
+                </engine:VisualElement>
+				<engine:VisualElement class="data-group">
+                    <engine:Label text="OpenPort" class="status-label" />
+                    <custom:Indicator name="openport-status" state="false" />
+                </engine:VisualElement>
+            </engine:VisualElement>
 
+            <engine:VisualElement name="housekeeping" class="section">
+                <engine:Label text="Housekeeping" class="section-title" />
+                <engine:VisualElement class="readings-container">
+                    <custom:Odometer value="23.5" caption="Instrument Temperature" class="temperature-gauge" />
+                    <custom:Odometer value="60.1" caption="SiPM A Temperature" class="temperature-gauge" />
+                    <custom:Odometer value="96" caption="SiPM B Temperature" class="temperature-gauge" />
+                </engine:VisualElement>
+
+
+            </engine:VisualElement>
+
+			<!-- Satellite Trajectory/Location Section -->
+			<engine:VisualElement class="section satellite-trajectory">
+				<engine:Label text="Satellite Trajectory/Location" class="section-title" />
+				<engine:Button name="expand_button" class="expand_button" icon-image="/Assets/Resources/UI_icons/expand.png" />
+
+
+				<engine:Image class="trajectory-map" style="--unity-image: url('/Assets/Resources/antartica_map.jpg');" />
 			</engine:VisualElement>
+
+
+			<!-- Sensor Detail Section -->
 
 
 
 			<!-- Sensor Graphs Section -->
-	m		<engine:VisualElement class="section sensor-graphs">
-				<engine:Label text="Sensor Graphs" class="section-title" />
-				<engine:Image class="graph-sensor" />
-				<engine:Label text="74%" class="sensor-value" />
-				<engine:Label text="1030 hPa" class="pressure-value" />
+			<engine:VisualElement class="section sensor-graphs">
+					<engine:Label text="Graphs" class="section-title" />
+					<custom:VectorChart name="chart-container" class="chart-container" />
 			</engine:VisualElement>
 
-			<!-- Groundstation Gateway Section -->
-			<engine:VisualElement class="section groundstation-gateway">
-				<engine:Label text="Groundstation Gateway" class="section-title" />
-				<engine:Label text="Station 55 Roseworth" class="gateway-name" />
-				<engine:Label text="Lat/Long: 54.341579/-1.435360" class="gateway-location" />
-				<engine:Label text="Last Seen: 25th November 2019" class="gateway-last-seen" />
-				<engine:Image class="map-image" />
-			</engine:VisualElement>
+            <engine:VisualElement name="calibrations" class="section">
+                <engine:Label text="Calibrations" class="section-title" />
+                <engine:VisualElement class="control-group">
+                    <engine:DropdownField label="Board Selection" name="board-selector" />
+                    <custom:ToggleButton state="false" class="sensor calibration-toggle"/>
+                </engine:VisualElement>
+            </engine:VisualElement>
 
 			<!-- News & Announcements Section -->
 			<engine:VisualElement class="section news-announcements">

@@ -5,10 +5,6 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 public class DashboardController : MonoBehaviour
 {
-    private Label countdownLabel;
-    private Label distanceLabel;
-    private Label speedLabel;
-
     private VisualElement outputContainer;
     private TextField inputField;
     private ScrollView scrollView;
@@ -22,10 +18,6 @@ public class DashboardController : MonoBehaviour
     {
         var root = GetComponent<UIDocument>().rootVisualElement;
 
-        countdownLabel = root.Q<Label>("countdown-timer");
-        distanceLabel = root.Q<Label>("mission-info");
-        speedLabel = root.Q<Label>("current-speed");
-
         // Example: Setting values dynamically
         //countdownLabel.text = "05:55:25";
         //distanceLabel.text = "245 KM";
@@ -35,15 +27,42 @@ public class DashboardController : MonoBehaviour
         outputContainer = root.Q<VisualElement>("terminal-output-container");
         inputField = root.Q<TextField>("terminal-input");
         scrollView = root.Q<ScrollView>("terminal-output");
+        Debug.Log("test");
+
 
         // Register input handler
         inputField.RegisterCallback<KeyDownEvent>(OnKeyDown);
 
-        Debug.Log("Input Field registered");
+        //Debug.Log("Input Field registered");
 
         // Initial welcome message
         WriteLine("Terminal Emulator v1.0");
         WriteLine("Type 'help' for available commands");
+
+        // Find chart container
+        //var chartContainer = root.Q<VisualElement>("chart-container");
+
+        // Create and add chart
+        //XChartElement chartElement = new XChartElement();
+        //chartContainer.Add(chartElement);
+
+        // Add sample data
+        //var data = new float[] { 10, 20, 15, 25, 18 };
+        //var labels = new string[] { "Mon", "Tue", "Wed", "Thu", "Fri" };
+        //chartElement.AddData("Sample Series", data, labels);
+        // Create the chart
+        var chart = root.Q<CustomUI.VectorChart>("chart-container");
+
+        var data = new List<Vector2>();
+        for (float x = 0; x <= 10; x += 0.5f)
+        {
+            data.Add(new Vector2(x, Mathf.Sin(x) * 10));
+        }
+
+        // Set the data
+        chart.SetData(data);
+
+        // Customize appearance (optional)
     }
 
     // Update method to periodically refresh data if needed

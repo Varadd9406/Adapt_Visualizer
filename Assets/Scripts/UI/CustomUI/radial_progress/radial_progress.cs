@@ -22,7 +22,7 @@ namespace CustomUI
         Color m_ProgressColor = Color.green;
 
         // This is the label that displays the percentage.
-        Label m_Label;
+        Label m_ValueLabel;
 
         // This is the number that the Label displays as a percentage.
         float m_Progress;
@@ -39,7 +39,7 @@ namespace CustomUI
                 // Whenever the progress property changes, MarkDirtyRepaint() is named. This causes a call to the
                 // generateVisualContents callback.
                 m_Progress = value;
-                m_Label.text = Mathf.Clamp(Mathf.Round(value), 0, 100) + "%";
+                m_ValueLabel.text = Mathf.Clamp(Mathf.Round(value), 0, 100) + "%";
                 MarkDirtyRepaint();
             }
         }
@@ -48,9 +48,20 @@ namespace CustomUI
         public RadialProgress()
         {
             // Create a Label, add a USS class name, and add it to this visual tree.
-            m_Label = new Label();
-            m_Label.AddToClassList(ussLabelClassName);
-            Add(m_Label);
+            style.display = DisplayStyle.Flex;
+            style.flexDirection = FlexDirection.Column; // Stack children vertically
+            style.alignItems = Align.Center; // Center children horizontally
+            //style.backgroundColor = Color.gray;
+            //style.height = new StyleLength(Length.Percent(100)); // Take full height
+
+            // Create and add value label
+            m_ValueLabel = new Label();
+            m_ValueLabel.AddToClassList(ussLabelClassName);
+            m_ValueLabel.style.flexGrow = 1; // Takes up available space
+            m_ValueLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
+            // If you want the label to take full width
+            m_ValueLabel.style.width = new StyleLength(Length.Percent(100));
+            Add(m_ValueLabel);
 
             // Add the USS class name for the overall control.
             AddToClassList(ussClassName);
