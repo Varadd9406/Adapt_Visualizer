@@ -32,13 +32,13 @@
                     <custom:Indicator name="openport-status" state="false" />
                 </engine:VisualElement>
             </engine:VisualElement>
-
+					
             <engine:VisualElement name="housekeeping" class="section">
                 <engine:Label text="Housekeeping" class="section-title" />
                 <engine:VisualElement class="readings-container">
-                    <custom:Odometer value="23.5" caption="Instrument Temperature" class="temperature-gauge" />
-                    <custom:Odometer value="60.1" caption="SiPM A Temperature" class="temperature-gauge" />
-                    <custom:Odometer value="96" caption="SiPM B Temperature" class="temperature-gauge" />
+                    <custom:Odometer value="23.5" caption="Instrument Temperature" class="temperature-gauge" name="instrument_temp"/>
+                    <custom:Odometer value="60.1" caption="SiPM A Temperature" class="temperature-gauge" name="sipm_a_temp"/>
+                    <custom:Odometer value="96" caption="SiPM B Temperature" class="temperature-gauge" name="sipm_b_temp"/>
                 </engine:VisualElement>
 
 

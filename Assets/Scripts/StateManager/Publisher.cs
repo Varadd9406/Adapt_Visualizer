@@ -1,4 +1,7 @@
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Threading.Tasks;
+using Unity.VisualScripting.FullSerializer;
 
 namespace Adapt
 {
@@ -13,7 +16,7 @@ namespace Adapt
     public class StatePublisher : IPublisher
     {
         private List<IObserver> observers;
-        private Data data;
+        private Dictionary<string,object> data;
         public StatePublisher()
         {
             observers = new List<IObserver>();
@@ -21,7 +24,8 @@ namespace Adapt
 
         public void register(IObserver observer)
         {
-
+            observers.Add(observer);
+            UnityEngine.Debug.Log("registered");
         }
         public void unregister(IObserver observer)
         {
@@ -29,15 +33,21 @@ namespace Adapt
         }
         public void notifyObserver()
         {
+
             foreach (IObserver observer in observers)
             {
-                observer.update(data);
+                if(data!=null)
+                {
+
+                    observer.update(data);
+                }
+
             }
         }
 
-        public void getState()
+        public async Task getState()
         {
-
+            data = await RestClient.GetJsonAsDictionary("http://localhost:5000/temperatures");
         }
 
 

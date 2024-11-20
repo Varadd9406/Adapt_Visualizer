@@ -3,6 +3,11 @@ using UnityEngine.UIElements;
 using System;
 using System.Collections.Generic;
 using UnityEngine.UI;
+using Adapt;
+using System.Collections;
+using System.Net.Http;
+using System.Threading.Tasks;
+
 public class DashboardController : MonoBehaviour
 {
     private VisualElement outputContainer;
@@ -13,11 +18,15 @@ public class DashboardController : MonoBehaviour
     private VisualElement sensorGraphs;
     private bool isExpanded = false;
 
+    private StatePublisher statePublisher;
 
-    void OnEnable()
+
+
+    async void OnEnable()
     {
         var root = GetComponent<UIDocument>().rootVisualElement;
 
+        statePublisher = new StatePublisher();
         // Example: Setting values dynamically
         //countdownLabel.text = "05:55:25";
         //distanceLabel.text = "245 KM";
@@ -27,7 +36,12 @@ public class DashboardController : MonoBehaviour
         outputContainer = root.Q<VisualElement>("terminal-output-container");
         inputField = root.Q<TextField>("terminal-input");
         scrollView = root.Q<ScrollView>("terminal-output");
-        Debug.Log("test");
+
+        statePublisher.register(root.Q<CustomUI.Odometer>("instrument_temp"));
+        statePublisher.register(root.Q<CustomUI.Odometer>("sipm_a_temp"));
+        statePublisher.register(root.Q<CustomUI.Odometer>("sipm_b_temp"));
+
+
 
 
         // Register input handler
@@ -53,6 +67,7 @@ public class DashboardController : MonoBehaviour
         // Create the chart
         var chart = root.Q<CustomUI.VectorChart>("chart-container");
 
+
         var data = new List<Vector2>();
         for (float x = 0; x <= 10; x += 0.5f)
         {
@@ -61,6 +76,9 @@ public class DashboardController : MonoBehaviour
 
         // Set the data
         chart.SetData(data);
+
+        await UpdateValues();
+
 
         // Customize appearance (optional)
     }
@@ -190,4 +208,15 @@ public class DashboardController : MonoBehaviour
     {
         outputContainer.Clear();
     }
+
+    public async Task UpdateValues()
+    {
+        while (true)
+        {
+            await statePublisher.getState();
+            statePublisher.notifyObserver();
+            await Task.Delay(5000);
+        }
+    }
+
 }

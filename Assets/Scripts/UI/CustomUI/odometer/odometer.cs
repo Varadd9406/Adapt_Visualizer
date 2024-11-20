@@ -4,6 +4,9 @@ using UnityEngine.UIElements;
 using System;
 using Unity.VisualScripting;
 using Adapt;
+using System.Collections.Generic;
+using System.Text.Json;
+using static UnityEngine.Rendering.DebugUI;
 namespace CustomUI
 {
     // An element that displays progress inside a partially filled circle
@@ -201,8 +204,22 @@ namespace CustomUI
             painter.Stroke();
         }
 
-        public void update(Data data)
+        public void update(Dictionary<string, object> data)
         {
+            if (data[name] is JsonElement element)
+            {
+                if (element.ValueKind == JsonValueKind.Number)
+                {
+                    if (element.TryGetDouble(out double doubleValue))
+                    {
+                        value = (float)doubleValue;
+                        m_ValueLabel.text = (doubleValue.ToSafeString());
+                        MarkDirtyRepaint();
+                    }
+                }
+            }
         }
+
     }
+    
 }

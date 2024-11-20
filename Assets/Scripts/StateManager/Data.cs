@@ -1,7 +1,10 @@
+using System.Runtime.Serialization;
+
+
 namespace Adapt
 {
-    public class Data
+    public class StateDto
     {
-        public float SipmTemperatureA, SipmTemperatureB;
+
     }
 }
