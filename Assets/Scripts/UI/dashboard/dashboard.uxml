@@ -61,7 +61,7 @@
 			<!-- Sensor Graphs Section -->
 			<engine:VisualElement class="section sensor-graphs">
 					<engine:Label text="Graphs" class="section-title" />
-					<custom:VectorChart name="chart-container" class="chart-container" />
+					<custom:VectorChart name="altitude" class="chart-container"/>
 			</engine:VisualElement>
 
             <engine:VisualElement name="calibrations" class="section">

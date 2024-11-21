@@ -25,7 +25,7 @@ namespace Adapt
         public void register(IObserver observer)
         {
             observers.Add(observer);
-            UnityEngine.Debug.Log("registered");
+            //UnityEngine.Debug.Log("registered");
         }
         public void unregister(IObserver observer)
         {

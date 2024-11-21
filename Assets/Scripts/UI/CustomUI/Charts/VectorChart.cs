@@ -2,20 +2,30 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using System.Collections.Generic;
 using System.Linq;
+using Adapt;
+using static UnityEngine.Rendering.DebugUI;
+using System.Text.Json;
+using Unity.VisualScripting;
+using System;
 
 namespace CustomUI
 {
 
     [UxmlElement]
-    public partial class VectorChart : VisualElement
+    public partial class VectorChart : VisualElement, IObserver
     {
-        private List<Vector2> dataPoints = new List<Vector2>();
         private const float PADDING = 40f;
         private const float TICK_SIZE = 5f;
         private const float POINT_RADIUS = 3f;
+        private const int BUFFER_SIZE = 100;
+
+        private SlidingBuffer<System.Numerics.Vector<double>> dataPoints = new SlidingBuffer<System.Numerics.Vector<double>>(BUFFER_SIZE);
+
+
+        private List<TextElement> labelElements = new List<TextElement>();
 
         // Customizable properties
-        public Color AxisColor { get; set; } = new Color(0.4f, 0.4f, 0.4f,0.4f);
+        public Color AxisColor { get; set; } = new Color(0.7f, 0.7f, 0.7f,1f);
         public Color LineColor { get; set; } = new Color(0.2f, 0.6f, 1f);
         public Color GridColor { get; set; } = new Color(0.3f, 0.3f, 0.3f, 0.5f);
         public bool ShowGrid { get; set; } = true;
@@ -33,20 +43,121 @@ namespace CustomUI
             RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
         }
 
-        public void SetData(List<Vector2> points)
+        public void update(Dictionary<string, object> data)
         {
-            dataPoints = new List<Vector2>(points);
+            if (data["timestamp"] is JsonElement x_value && data[name] is JsonElement y_value)
+            {
+                if (x_value.ValueKind == JsonValueKind.Number && y_value.ValueKind == JsonValueKind.Number)
+                {
+                    if (x_value.TryGetDouble(out double timeValue) && y_value.TryGetDouble(out double value))
+                    {
+                        dataPoints.Add(new System.Numerics.Vector<double>(new double[] { timeValue, value }));
+                        MarkDirtyRepaint();
+                        RecreateLabels();
+                    }
+                }
+            }
+        }
+        public void ResetData()
+        {
+            dataPoints = new SlidingBuffer<System.Numerics.Vector<double>>(BUFFER_SIZE);
             MarkDirtyRepaint();
+            RecreateLabels();
         }
 
         private void OnGeometryChanged(GeometryChangedEvent evt)
         {
             MarkDirtyRepaint();
+            RecreateLabels();
         }
+
+        private void ClearLabels()
+        {
+            foreach (var label in labelElements)
+            {
+                Remove(label);
+            }
+            labelElements.Clear();
+        }
+        private void RecreateLabels()
+        {
+            if (dataPoints.Count() < 2) return;
+
+            ClearLabels();
+
+            var rect = contentRect;
+            var chartArea = new Rect(
+                PADDING,
+                PADDING,
+                rect.width - (PADDING * 2),
+                rect.height - (PADDING * 2)
+            );
+
+            double minX = dataPoints.Min(p => p[0]);
+            double maxX = dataPoints.Max(p => p[0]);
+            double minY = dataPoints.Min(p => p[1]);
+            double maxY = dataPoints.Max(p => p[1]);
+
+            // Add padding to Y range
+            double yPadding = (maxY - minY) * 0.1f;
+            minY -= yPadding;
+            maxY += yPadding;
+
+            // X axis labels
+            for (int i = 0; i <= 5; i++)
+            {
+                float x = chartArea.x + (chartArea.width * i / 5);
+                double value = Adapt.MathUtil.LerpDouble(minX, maxX, i / 5f);
+                DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds((long)value);
+                string dateString = dateTimeOffset.ToString("HH:mm:ss");
+
+                var label = new TextElement
+                {
+
+                    text = dateString,
+                    style =
+                    {
+                        position = Position.Absolute,
+                        left = x - 20,
+                        top = chartArea.y + chartArea.height + TICK_SIZE + 5,
+                        color = new StyleColor(AxisColor),
+                        unityTextAlign = TextAnchor.UpperCenter,
+                        fontSize = 12
+                    }
+                };
+                Add(label);
+                labelElements.Add(label);
+            }
+
+            // Y axis labels
+            for (int i = 0; i <= 5; i++)
+            {
+                float y = chartArea.y + (chartArea.height * (5 - i) / 5);
+                double value = Adapt.MathUtil.LerpDouble(minY, maxY, i / 5f);
+
+                var label = new TextElement
+                {
+                    text = value.ToString("F1"),
+                    style =
+                    {
+                        position = Position.Absolute,
+                        left = PADDING - 50,
+                        top = y - 8,
+                        color = new StyleColor(AxisColor),
+                        unityTextAlign = TextAnchor.MiddleRight,
+                        fontSize = 12
+                    }
+                };
+                Add(label);
+                labelElements.Add(label);
+            }
+        }
+
+
 
         private void OnGenerateVisualContent(MeshGenerationContext mgc)
         {
-            if (dataPoints.Count < 2) return;
+            if (dataPoints.Count() < 2) return;
 
             var painter = mgc.painter2D;
             var rect = contentRect;
@@ -61,13 +172,13 @@ namespace CustomUI
             //Debug.Log(chartArea);
 
             // Get data ranges
-            float minX = dataPoints.Min(p => p.x);
-            float maxX = dataPoints.Max(p => p.x);
-            float minY = dataPoints.Min(p => p.y);
-            float maxY = dataPoints.Max(p => p.y);
+            double minX = dataPoints.Min(p => p[0]);
+            double maxX = dataPoints.Max(p => p[0]);
+            double minY = dataPoints.Min(p => p[1]);
+            double maxY = dataPoints.Max(p => p[1]);
 
             // Add some padding to Y range
-            float yPadding = (maxY - minY) * 0.1f;
+            double yPadding = (maxY - minY) * 0.1f;
             minY -= yPadding;
             maxY += yPadding;
 
@@ -150,9 +261,6 @@ namespace CustomUI
                 painter.Stroke();
 
                 // Draw label
-                //DrawText(painter, value.ToString("F1"),
-                //    new Vector2(x, chartArea.y + chartArea.height + TICK_SIZE + 5),
-                //    TextAnchor.UpperCenter);
             }
 
             // Y axis labels
@@ -174,23 +282,34 @@ namespace CustomUI
             }
         }
 
-        private void DrawDataLine(Painter2D painter, Rect chartArea, float minX, float maxX, float minY, float maxY)
+        private void DrawDataLine(Painter2D painter, Rect chartArea, double minX, double maxX, double minY, double maxY)
         {
             painter.strokeColor = LineColor;
             painter.lineWidth = LineWidth;
             painter.BeginPath();
 
-            for (int i = 0; i < dataPoints.Count; i++)
-            {
-                float x = Mathf.Lerp(chartArea.x, chartArea.x + chartArea.width,
-                    (dataPoints[i].x - minX) / (maxX - minX));
-                float y = Mathf.Lerp(chartArea.y + chartArea.height, chartArea.y,
-                    (dataPoints[i].y - minY) / (maxY - minY));
+            bool firstVal = true;
 
-                if (i == 0)
+            foreach (var point in dataPoints)
+            {
+                Debug.Log(point);
+
+                float x = Mathf.Lerp(chartArea.x, chartArea.x + chartArea.width,
+                    (float)((point[0] - minX) / (maxX - minX)));
+
+
+                float y = Mathf.Lerp(chartArea.y + chartArea.height, chartArea.y,
+                    (float)((point[1] - minY) / (maxY - minY)));
+
+                if (firstVal)
+                {
+                    firstVal = false;
                     painter.MoveTo(new Vector2(x, y));
+                }
                 else
+                {
                     painter.LineTo(new Vector2(x, y));
+                }
             }
 
             painter.Stroke();
@@ -201,9 +320,11 @@ namespace CustomUI
             foreach (var point in dataPoints)
             {
                 float x = Mathf.Lerp(chartArea.x, chartArea.x + chartArea.width,
-                    (point.x - minX) / (maxX - minX));
+                    (float)((point[0] - minX) / (maxX - minX)));
+
+
                 float y = Mathf.Lerp(chartArea.y + chartArea.height, chartArea.y,
-                    (point.y - minY) / (maxY - minY));
+                    (float)((point[1] - minY) / (maxY - minY)));
 
                 painter.BeginPath();
                 painter.Arc(new Vector2(x, y), POINT_RADIUS, 0, 360);

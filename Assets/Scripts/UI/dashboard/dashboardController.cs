@@ -7,7 +7,6 @@ using Adapt;
 using System.Collections;
 using System.Net.Http;
 using System.Threading.Tasks;
-
 public class DashboardController : MonoBehaviour
 {
     private VisualElement outputContainer;
@@ -19,6 +18,8 @@ public class DashboardController : MonoBehaviour
     private bool isExpanded = false;
 
     private StatePublisher statePublisher;
+
+     
 
 
 
@@ -40,6 +41,8 @@ public class DashboardController : MonoBehaviour
         statePublisher.register(root.Q<CustomUI.Odometer>("instrument_temp"));
         statePublisher.register(root.Q<CustomUI.Odometer>("sipm_a_temp"));
         statePublisher.register(root.Q<CustomUI.Odometer>("sipm_b_temp"));
+
+        statePublisher.register(root.Q<CustomUI.VectorChart>("altitude"));
 
 
 
@@ -65,17 +68,6 @@ public class DashboardController : MonoBehaviour
         //var labels = new string[] { "Mon", "Tue", "Wed", "Thu", "Fri" };
         //chartElement.AddData("Sample Series", data, labels);
         // Create the chart
-        var chart = root.Q<CustomUI.VectorChart>("chart-container");
-
-
-        var data = new List<Vector2>();
-        for (float x = 0; x <= 10; x += 0.5f)
-        {
-            data.Add(new Vector2(x, Mathf.Sin(x) * 10));
-        }
-
-        // Set the data
-        chart.SetData(data);
 
         await UpdateValues();
 
@@ -215,7 +207,7 @@ public class DashboardController : MonoBehaviour
         {
             await statePublisher.getState();
             statePublisher.notifyObserver();
-            await Task.Delay(5000);
+            await Task.Delay(500);
         }
     }
 
