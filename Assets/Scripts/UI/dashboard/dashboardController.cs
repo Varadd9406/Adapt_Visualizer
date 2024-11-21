@@ -42,8 +42,12 @@ public class DashboardController : MonoBehaviour
         statePublisher.register(root.Q<CustomUI.Odometer>("sipm_a_temp"));
         statePublisher.register(root.Q<CustomUI.Odometer>("sipm_b_temp"));
 
-        statePublisher.register(root.Q<CustomUI.VectorChart>("altitude"));
+        statePublisher.register(root.Q<CustomUI.TimeChart>("altitude"));
 
+
+        statePublisher.register(root.Q<CustomUI.Indicator>("starlink-status"));
+        statePublisher.register(root.Q<CustomUI.Indicator>("tdrss-status"));
+        statePublisher.register(root.Q<CustomUI.Indicator>("openport-status"));
 
 
 

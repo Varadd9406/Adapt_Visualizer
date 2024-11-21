@@ -27,10 +27,6 @@
                     <engine:Label text="OpenPort" class="status-label" />
                     <custom:Indicator name="openport-status" state="false" />
                 </engine:VisualElement>
-				<engine:VisualElement class="data-group">
-                    <engine:Label text="OpenPort" class="status-label" />
-                    <custom:Indicator name="openport-status" state="false" />
-                </engine:VisualElement>
             </engine:VisualElement>
 					
             <engine:VisualElement name="housekeeping" class="section">
@@ -61,7 +57,7 @@
 			<!-- Sensor Graphs Section -->
 			<engine:VisualElement class="section sensor-graphs">
 					<engine:Label text="Graphs" class="section-title" />
-					<custom:VectorChart name="altitude" class="chart-container"/>
+					<custom:TimeChart name="altitude" class="chart-container"/>
 			</engine:VisualElement>
 
             <engine:VisualElement name="calibrations" class="section">

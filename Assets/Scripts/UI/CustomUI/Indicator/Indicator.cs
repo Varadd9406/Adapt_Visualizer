@@ -1,10 +1,15 @@
 using UnityEngine;
 using UnityEngine.UIElements;
+using Adapt;
+using System.Collections.Generic;
+using static UnityEngine.Rendering.DebugUI;
+using System.Text.Json;
+using Unity.VisualScripting;
 
 namespace CustomUI
 {
     [UxmlElement]
-    public partial class Indicator : VisualElement
+    public partial class Indicator : VisualElement, IObserver
     {
         private bool m_State;
         private readonly Image buttonImage;
@@ -41,6 +46,21 @@ namespace CustomUI
             // Set default size
             //style.width = 60;
             //style.height = 30;
+        }
+        public void update(Dictionary<string, object> data)
+        {
+            if (data[name] is JsonElement element)
+            {
+                if (element.ValueKind == JsonValueKind.True)
+                {
+                    m_State = true;
+                }
+                else
+                {
+                    m_State = false;
+                }
+            }
+            UpdateVisualState();
         }
 
         public void SetTextures(Texture2D onTex, Texture2D offTex)

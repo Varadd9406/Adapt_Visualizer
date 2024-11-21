@@ -12,7 +12,7 @@ namespace CustomUI
 {
 
     [UxmlElement]
-    public partial class VectorChart : VisualElement, IObserver
+    public partial class TimeChart : VisualElement, IObserver
     {
         private const float PADDING = 40f;
         private const float TICK_SIZE = 5f;
@@ -36,7 +36,7 @@ namespace CustomUI
         [UxmlAttribute]
         public float LineWidth { get; set; } = 4f;
 
-        public VectorChart()
+        public TimeChart()
         {
 
             generateVisualContent += OnGenerateVisualContent;
@@ -157,7 +157,6 @@ namespace CustomUI
 
         private void OnGenerateVisualContent(MeshGenerationContext mgc)
         {
-            if (dataPoints.Count() < 2) return;
 
             var painter = mgc.painter2D;
             var rect = contentRect;
@@ -169,7 +168,12 @@ namespace CustomUI
                 rect.width - (PADDING * 2),
                 rect.height - (PADDING * 2)
             );
+
+            DrawAxes( painter, chartArea );
             //Debug.Log(chartArea);
+
+            if (dataPoints.Count() < 2) return;
+
 
             // Get data ranges
             double minX = dataPoints.Min(p => p[0]);
@@ -186,7 +190,6 @@ namespace CustomUI
             //DrawGrid(painter, chartArea, minX, maxX, minY, maxY);
 
             // Draw axes
-            DrawAxes(painter, chartArea);
 
             // Draw labels
             //DrawAxisLabels(painter, chartArea, minX, maxX, minY, maxY);
@@ -292,7 +295,6 @@ namespace CustomUI
 
             foreach (var point in dataPoints)
             {
-                Debug.Log(point);
 
                 float x = Mathf.Lerp(chartArea.x, chartArea.x + chartArea.width,
                     (float)((point[0] - minX) / (maxX - minX)));
@@ -347,9 +349,9 @@ namespace CustomUI
 
     public static class VectorChartExtensions
     {
-        public static VectorChart CreateVectorChart(this VisualElement parent)
+        public static TimeChart CreateVectorChart(this VisualElement parent)
         {
-            var chart = new VectorChart();
+            var chart = new TimeChart();
             parent.Add(chart);
             return chart;
         }
