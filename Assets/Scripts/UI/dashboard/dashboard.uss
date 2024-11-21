@@ -322,4 +322,20 @@
     border-radius: 3px;
 }
 
- 
+.update-window{
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 10%;
+    height: 5%;
+}
+
+.refresh-button{
+    height: 60%;
+}
+.refresh-botton:hover{
+    border-width: 1px;
+}
+.update-window-text{
+    color: rgb(180,180,180);
+}

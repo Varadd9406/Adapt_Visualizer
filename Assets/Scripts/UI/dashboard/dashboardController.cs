@@ -7,6 +7,8 @@ using Adapt;
 using System.Collections;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System;
+
 public class DashboardController : MonoBehaviour
 {
     private VisualElement outputContainer;
@@ -16,10 +18,12 @@ public class DashboardController : MonoBehaviour
     private int historyIndex = -1;
     private VisualElement sensorGraphs;
     private bool isExpanded = false;
-
+    private Label lastUpdatedLabel;
+    private DateTime lastUpdatedDateTime;
+    private CustomUI.ToggleButton refreshButton;
     private StatePublisher statePublisher;
 
-     
+
 
 
 
@@ -37,6 +41,15 @@ public class DashboardController : MonoBehaviour
         outputContainer = root.Q<VisualElement>("terminal-output-container");
         inputField = root.Q<TextField>("terminal-input");
         scrollView = root.Q<ScrollView>("terminal-output");
+
+        lastUpdatedLabel = root.Q<Label>("update-window-text");
+        refreshButton = root.Q<CustomUI.ToggleButton>("refresh-button");
+        refreshButton.SetOnClickBehavior(async () =>
+        {
+            await UpdateValues();
+        });
+
+
 
         statePublisher.register(root.Q<CustomUI.Odometer>("instrument_temp"));
         statePublisher.register(root.Q<CustomUI.Odometer>("sipm_a_temp"));
@@ -73,7 +86,7 @@ public class DashboardController : MonoBehaviour
         //chartElement.AddData("Sample Series", data, labels);
         // Create the chart
 
-        await UpdateValues();
+        await GetUpdatedStateAtTimeInterval();
 
 
         // Customize appearance (optional)
@@ -207,12 +220,31 @@ public class DashboardController : MonoBehaviour
 
     public async Task UpdateValues()
     {
+        await statePublisher.getState();
+
+        statePublisher.notifyObserver();
+        lastUpdatedDateTime = DateTime.Now;
+    }
+
+    public async Task GetUpdatedStateAtTimeInterval()
+    {
         while (true)
         {
-            await statePublisher.getState();
-            statePublisher.notifyObserver();
-            await Task.Delay(500);
+            await UpdateValues();
+
+            await Task.Delay(3000);
         }
+    }
+
+    public void Update()
+    {
+        if(lastUpdatedDateTime == null)
+        {
+            Debug.Log("YOOOO");
+            lastUpdatedLabel.text = "Not updated since start up";
+            return;
+        }
+        lastUpdatedLabel.text = "Updated " + (DateTime.Now.Subtract(lastUpdatedDateTime)).TotalSeconds.ToString("F0") + "s ago \n";
     }
 
 }

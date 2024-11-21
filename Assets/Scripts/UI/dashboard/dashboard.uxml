@@ -64,7 +64,7 @@
                 <engine:Label text="Calibrations" class="section-title" />
                 <engine:VisualElement class="control-group">
                     <engine:DropdownField label="Board Selection" name="board-selector" />
-                    <custom:ToggleButton state="false" class="sensor calibration-toggle"/>
+                    <custom:ToggleButton state="false" on_img="UI_icons/switch-on" off_img="UI_icons/switch-off" class="sensor calibration-toggle"/>
                 </engine:VisualElement>
             </engine:VisualElement>
 
@@ -86,6 +86,11 @@
 					<engine:Label text=">" class="prompt-symbol"/>
 					<engine:TextField name="terminal-input" class="terminal-input"/>
 				</engine:VisualElement>
+			</engine:VisualElement>
+
+			<engine:VisualElement name="update-window" class="update-window">
+					<engine:Label text="Updated N/A secs ago" name="update-window-text" class="update-window-text"/>
+                    <custom:ToggleButton default_img="UI_icons/refresh" name="refresh-button" class="refresh-button"/>
 			</engine:VisualElement>
 		
 		</engine:VisualElement>
