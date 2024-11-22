@@ -12,7 +12,7 @@ using static UnityEngine.Rendering.DebugUI;
 namespace CustomUI
 {
     [UxmlElement]
-    public partial class HeadingInstrument : VisualElement, IObserver
+    public partial class AltitudeInstrument : VisualElement, IObserver
     {
         private float m_Angle;
         private readonly Image m_Outer;
@@ -22,6 +22,9 @@ namespace CustomUI
 
         private float currentRotation = 0f;
         private float rotationSpeed = 25f;
+
+        private float currentTranslation = 0f;
+        private float translationSpeed = 5f;
 
         [UxmlAttribute]
         public float angle
@@ -33,7 +36,7 @@ namespace CustomUI
                 UpdateVisualState();
             }
         }
-        public HeadingInstrument()
+        public AltitudeInstrument()
         {
 
             // Create image element
@@ -89,7 +92,7 @@ namespace CustomUI
 
             //generateVisualContent += GenerateVisualContent;
 
-            EditorApplication.update += RotateImage;
+            EditorApplication.update += TranslateInnerImage;
 
             UpdateVisualState();
 
@@ -107,7 +110,7 @@ namespace CustomUI
         {
 
         }
-        private void RotateImage()
+        private void RotateOuterImage()
         {
             //Debug.Log(m_Angle);
             // Calculate new rotation based on time
@@ -131,6 +134,40 @@ namespace CustomUI
 
             // Apply the rotation
             m_Outer.style.rotate = new Rotate(new Angle(currentRotation, AngleUnit.Degree));
+
+            // Optional: Reset rotation after 360 degrees to prevent floating-point issues over time
+            if (currentRotation >= 360f)
+            {
+                currentRotation -= 360f;
+            }
+        }
+
+
+
+        private void TranslateInnerImage()
+        {
+            Debug.Log(m_Angle);
+            // Calculate new rotation based on time
+            float translationRemaining = m_Angle - currentTranslation;
+
+            float translationThisFrame = Mathf.Min(Mathf.Abs(translationRemaining), translationSpeed * Time.deltaTime);
+
+            if (Mathf.Abs(translationRemaining) < 0.1f)
+            {
+                return;
+            }
+
+
+            if (translationRemaining < 0)
+            {
+                translationThisFrame *= -1;
+            }
+            currentTranslation += translationThisFrame;
+
+            //Debug.Log($"{currentRotation} {rotationThisFrame}");
+
+            // Apply the rotation
+            m_Inner.style.translate = new Translate(0,Length.Percent(currentTranslation));
 
             // Optional: Reset rotation after 360 degrees to prevent floating-point issues over time
             if (currentRotation >= 360f)

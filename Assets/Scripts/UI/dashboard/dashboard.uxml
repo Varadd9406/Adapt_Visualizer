@@ -45,7 +45,7 @@
 			    <engine:Label text="Satellite" class="section-title" />
 				<engine:VisualElement class="readings-container">
 
-					<custom:AltitudeInstrument class="altitude-instrument" name="altitude_instrument"/>
+					<custom:AltitudeInstrument angle="12" class="altitude-instrument" name="altitude_instrument"/>
 					<custom:HeadingInstrument class="heading-instrument" name="heading_instrument"/>
 				</engine:VisualElement>
 

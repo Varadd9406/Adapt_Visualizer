@@ -12,7 +12,7 @@ using static UnityEngine.Rendering.DebugUI;
 namespace CustomUI
 {
     [UxmlElement]
-    public partial class AltitudeInstrument : VisualElement, IObserver
+    public partial class HeadingInstrument : VisualElement, IObserver
     {
         private float m_Angle;
         private readonly Image m_Compass;
@@ -31,7 +31,7 @@ namespace CustomUI
                 UpdateVisualState();
             }
         }
-        public AltitudeInstrument()
+        public HeadingInstrument()
         {
 
             // Create image element

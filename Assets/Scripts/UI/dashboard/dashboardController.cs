@@ -57,7 +57,6 @@ public class DashboardController : MonoBehaviour
 
         statePublisher.register(root.Q<CustomUI.TimeChart>("altitude"));
 
-
         statePublisher.register(root.Q<CustomUI.Indicator>("starlink-status"));
         statePublisher.register(root.Q<CustomUI.Indicator>("tdrss-status"));
         statePublisher.register(root.Q<CustomUI.Indicator>("openport-status"));
