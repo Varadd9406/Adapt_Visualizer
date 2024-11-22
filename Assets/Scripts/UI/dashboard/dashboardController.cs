@@ -63,6 +63,10 @@ public class DashboardController : MonoBehaviour
         statePublisher.register(root.Q<CustomUI.Indicator>("openport-status"));
 
 
+        statePublisher.register(root.Q<CustomUI.HeadingInstrument>("heading_instrument"));
+
+        //statePublisher.register(root.Q<CustomUI.AltitudeInstrument>("altitude_instrument"));
+
 
         // Register input handler
         inputField.RegisterCallback<KeyDownEvent>(OnKeyDown);

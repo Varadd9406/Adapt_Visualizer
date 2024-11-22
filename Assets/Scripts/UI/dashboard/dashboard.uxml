@@ -42,11 +42,13 @@
 
 			<!-- Satellite Trajectory/Location Section -->
 			<engine:VisualElement class="section satellite-trajectory">
-				<engine:Label text="Satellite Trajectory/Location" class="section-title" />
-				<engine:Button name="expand_button" class="expand_button" icon-image="/Assets/Resources/UI_icons/expand.png" />
+			    <engine:Label text="Satellite" class="section-title" />
+				<engine:VisualElement class="readings-container">
 
+					<custom:AltitudeInstrument class="altitude-instrument" name="altitude_instrument"/>
+					<custom:HeadingInstrument class="heading-instrument" name="heading_instrument"/>
+				</engine:VisualElement>
 
-				<engine:Image class="trajectory-map" style="--unity-image: url('/Assets/Resources/antartica_map.jpg');" />
 			</engine:VisualElement>
 
 
