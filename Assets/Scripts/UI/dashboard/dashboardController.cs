@@ -23,6 +23,8 @@ public class DashboardController : MonoBehaviour
     private CustomUI.ToggleButton refreshButton;
     private StatePublisher statePublisher;
 
+    private Label missionClock;
+
 
 
 
@@ -41,6 +43,10 @@ public class DashboardController : MonoBehaviour
         outputContainer = root.Q<VisualElement>("terminal-output-container");
         inputField = root.Q<TextField>("terminal-input");
         scrollView = root.Q<ScrollView>("terminal-output");
+
+        missionClock = root.Q<Label>("mission_clock");
+        missionClock.text = "05:55:25";
+
 
         lastUpdatedLabel = root.Q<Label>("update-window-text");
         refreshButton = root.Q<CustomUI.ToggleButton>("refresh-button");
@@ -63,31 +69,18 @@ public class DashboardController : MonoBehaviour
 
 
         statePublisher.register(root.Q<CustomUI.HeadingInstrument>("heading_instrument"));
+        statePublisher.register(root.Q<CustomUI.AttitudeInstrument>("attitude_instrument"));
 
-        //statePublisher.register(root.Q<CustomUI.AltitudeInstrument>("altitude_instrument"));
+        statePublisher.register(root.Q<CustomUI.Map>("location"));
+
 
 
         // Register input handler
         inputField.RegisterCallback<KeyDownEvent>(OnKeyDown);
 
-        //Debug.Log("Input Field registered");
 
-        // Initial welcome message
-        WriteLine("Terminal Emulator v1.0");
+        WriteLine("Adapt Terminal");
         WriteLine("Type 'help' for available commands");
-
-        // Find chart container
-        //var chartContainer = root.Q<VisualElement>("chart-container");
-
-        // Create and add chart
-        //XChartElement chartElement = new XChartElement();
-        //chartContainer.Add(chartElement);
-
-        // Add sample data
-        //var data = new float[] { 10, 20, 15, 25, 18 };
-        //var labels = new string[] { "Mon", "Tue", "Wed", "Thu", "Fri" };
-        //chartElement.AddData("Sample Series", data, labels);
-        // Create the chart
 
         await GetUpdatedStateAtTimeInterval();
 
@@ -243,11 +236,16 @@ public class DashboardController : MonoBehaviour
     {
         if(lastUpdatedDateTime == null)
         {
-            Debug.Log("YOOOO");
             lastUpdatedLabel.text = "Not updated since start up";
             return;
         }
-        lastUpdatedLabel.text = "Updated " + (DateTime.Now.Subtract(lastUpdatedDateTime)).TotalSeconds.ToString("F0") + "s ago \n";
+        else
+        {
+            lastUpdatedLabel.text = "Updated " + (DateTime.Now.Subtract(lastUpdatedDateTime)).TotalSeconds.ToString("F0") + "s ago \n";
+        }
+
+        missionClock.text = DateTime.UtcNow.ToString("HH:mm:ss");
+
     }
 
 }

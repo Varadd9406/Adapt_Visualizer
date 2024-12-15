@@ -20,17 +20,6 @@
     border-radius: 8px;
 }
 
-.section2 {
-    position:absolute
-    width: 100%;
-    height: 100%;
-    background-color: rgba(51,58,72,255);
-    color: #ffffff;
-    margin: 10px;
-    padding: 15px;
-    border-radius: 0;
-}
-
 
 .section-title {
     font-size: 18px;
@@ -61,9 +50,10 @@
     height: 150px;
     width: 100%;
     background-size: cover;
+    background-color: rgb(20,20,20);
 }
 
-.mission-clock .countdown-timer {
+.mission-clock{
     font-size: 36px;
     font-weight: bold;
     color: #FFD700; /* Countdown Timer Color */
@@ -195,10 +185,6 @@
     margin:5px;
 }
 
-.sensor-detail{
-    flex-direction: row;
-
-}
 
 .chart-container{
     width:100%;
@@ -232,12 +218,6 @@
 
 .temperature-gauge {
     width: 33%;
-}
-
-.temperature-gauge .caption {
-    font-size: 12px;
-    color: rgb(180, 180, 180);
-    margin-top: 5px;
 }
 
 .power-gauge {
@@ -345,9 +325,12 @@
     height:100%;
 }
 
-.altitude-instrument{
+.attitude-instrument{
     width:100%;
     height:100%;
 }
 
-.flight
+.mission-timer{
+    width:100%;
+    height:100%;
+}

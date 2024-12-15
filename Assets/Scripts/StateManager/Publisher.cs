@@ -47,10 +47,7 @@ namespace Adapt
 
         public async Task getState()
         {
-            data = await RestClient.GetJsonAsDictionary("http://localhost:5000/temperatures");
+            data = await RestClient.GetJsonAsDictionary("http://localhost:5000/data");
         }
-
-
-
     }
 }

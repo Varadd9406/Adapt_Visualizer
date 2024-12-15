@@ -3,13 +3,10 @@
 
 	<engine:VisualElement class="container">
 		<engine:VisualElement class="grid-view">
+			<engine:VisualElement class="section">
+				<engine:Label text="Mission Clock" class="section-title" />
 
-			<engine:VisualElement class="section mission-clock">
-				<engine:Label text="Mission Clock/Countdown Clock" class="section-title" />
-				<engine:Label text="Countdown" class="countdown-title" />
-				<engine:Label text="05:55:25" class="countdown-timer" />
-				<engine:Label text="Distance: 245 KM" class="mission-info" />
-				<engine:Label text="Current Speed: 25,555 KM/H" class="mission-info" />
+				<engine:Label text="HH:MM:SS" class="mission-clock" name="mission_clock"/>
 			</engine:VisualElement>
 
 
@@ -44,8 +41,7 @@
 			<engine:VisualElement class="section satellite-trajectory">
 			    <engine:Label text="Satellite" class="section-title" />
 				<engine:VisualElement class="readings-container">
-
-					<custom:AltitudeInstrument angle="12" class="altitude-instrument" name="altitude_instrument"/>
+					<custom:AttitudeInstrument class="attitude-instrument" name="attitude_instrument"/>
 					<custom:HeadingInstrument class="heading-instrument" name="heading_instrument"/>
 				</engine:VisualElement>
 
@@ -73,7 +69,7 @@
 			<!-- News & Announcements Section -->
 			<engine:VisualElement class="section news-announcements">
 				<engine:Label text="News and Announcements" class="section-title" />
-				<engine:Label text="When many people think of astronauts..." class="announcement-text" />
+				<custom:Map class="antartica_map" name="location"/>
 			</engine:VisualElement>
 
 			<!--Terminal-->

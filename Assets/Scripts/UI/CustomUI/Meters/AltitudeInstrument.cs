@@ -1,6 +1,7 @@
 using Adapt;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Text.Json;
 using Unity.VisualScripting;
 using UnityEditor;
@@ -12,79 +13,44 @@ using static UnityEngine.Rendering.DebugUI;
 namespace CustomUI
 {
     [UxmlElement]
-    public partial class AltitudeInstrument : VisualElement, IObserver
+    public partial class AttitudeInstrument : VisualElement, IObserver
     {
-        private float m_Angle;
-        private readonly Image m_Outer;
-        private readonly Image m_Inner;
-        private readonly Image m_Marking;
+        private float m_Bank;
+        private float m_Yaw;
+        private readonly VisualElement m_Outer;
+        private readonly VisualElement m_Inner;
+        private readonly VisualElement m_Marking;
 
 
-        private float currentRotation = 0f;
-        private float rotationSpeed = 25f;
+        private float currentYaw = 0f;
+        private float currentBank = 0f;
 
-        private float currentTranslation = 0f;
-        private float translationSpeed = 5f;
+        private float rotationSpeed = 5f;
+
 
         [UxmlAttribute]
-        public float angle
+        public float bank
         {
-            get => m_Angle;
+            get => m_Bank;
             set
             {
-                m_Angle = value;
+                m_Bank = value;
                 UpdateVisualState();
             }
         }
-        public AltitudeInstrument()
+
+        [UxmlAttribute]
+        public float yaw
         {
-
-            // Create image element
-            m_Inner = new Image();
-            m_Outer = new Image();
-            m_Marking = new Image();
-
-            m_Outer.style.position = Position.Absolute;
-            m_Inner.style.position = Position.Absolute;
-            m_Marking.style.position = Position.Absolute;
-
-
-            m_Outer.image = Resources.Load<Texture2D>("UI_Icons/altitude_indicator_outer");
-            m_Inner.image = Resources.Load<Texture2D>("UI_Icons/altitude_indicator_inner");
-            m_Marking.image = Resources.Load<Texture2D>("UI_icons/artificial_horizon_indicator");
-
-
-            m_Outer.style.width = Length.Percent(100);
-            m_Outer.style.height = Length.Percent(100);
-
-            m_Inner.style.width = Length.Percent(150);
-            m_Inner.style.height = Length.Percent(150);
-
-            m_Marking.style.width = Length.Percent(100);
-            m_Marking.style.height = Length.Percent(100);
-
-            m_Inner.style.left = new Length(-25, LengthUnit.Percent);
-            m_Inner.style.top = new Length(-25, LengthUnit.Percent);
-            //m_Outer.style.backgroundColor = Color.green;
-
-            //m_Inner.style.left = new Length(25, LengthUnit.Percent);
-            //m_Inner.style.backgroundColor = Color.green;
-
-
-            m_Outer.style.transformOrigin = new TransformOrigin(Length.Percent(50), Length.Percent(50));
-            m_Inner.style.transformOrigin = new TransformOrigin(Length.Percent(50), Length.Percent(50));
-            m_Marking.style.transformOrigin = new TransformOrigin(Length.Percent(50), Length.Percent(50));
-
-            //m_PlaneTexture = Resources.Load<Texture2D>(m_CompassTexturePath);
-
-
-
-
-            Add(m_Inner);
-            Add(m_Outer);
-            Add(m_Marking);
-
-
+            get => m_Yaw;
+            set
+            {
+                m_Yaw = value;
+                UpdateVisualState();
+            }
+        }
+        public AttitudeInstrument()
+        {
 
             // Make clickable
             //RegisterCallback<ClickEvent>(OnClick);
@@ -92,102 +58,259 @@ namespace CustomUI
 
             //generateVisualContent += GenerateVisualContent;
 
-            EditorApplication.update += TranslateInnerImage;
+            generateVisualContent += OnGenerateVisualContent;
 
-            UpdateVisualState();
+
+            //UpdateVisualState();
 
             //style.rotate = new Rotate(180);
         }
 
 
 
-        void GenerateVisualContent(MeshGenerationContext context)
+        void OnGenerateVisualContent(MeshGenerationContext mgc)
         {
+            float yawRemaining = m_Yaw - currentYaw;
+
+            float yawThisFrame = Mathf.Min(Mathf.Abs(yawRemaining), rotationSpeed * Time.deltaTime);
+
+            if (yawRemaining < 0)
+            {
+                yawThisFrame *= -1;
+            }
+            currentYaw += yawThisFrame;
+
+
+            float bankRemaining = m_Bank - currentBank;
+
+            float bankThisFrame = Mathf.Min(Mathf.Abs(bankRemaining), rotationSpeed * Time.deltaTime);
+
+            if (bankRemaining < 0)
+            {
+                bankThisFrame *= -1;
+            }
+            currentBank += bankThisFrame;
+
+
+
+            var painter = mgc.painter2D;
+            var rect = mgc.visualElement.contentRect;
+
+            // Calculate dimensions based on container size
+            float width = rect.width;
+            float height = rect.height;
+            //Debug.Log(width);
+
+            // Colors
+            UnityEngine.Color triangleColor = new UnityEngine.Color(1f, 0.4f, 0.2f); // Red-orange
+            UnityEngine.Color barColor = new UnityEngine.Color(1f, 0.6f, 0.4f);      // Coral
+            UnityEngine.Color stemColor = new UnityEngine.Color(0.6f, 0.4f, 0.3f);   // Brown
+            UnityEngine.Color skyColor = new UnityEngine.Color(0.1f, 0.4f, 0.95f);
+            UnityEngine.Color earthColor = new UnityEngine.Color(0.4f, 0.3f, 0.3f);
+
+            float innerCircleRadius = 0.4f;
+            float outerCircleRadius = 0.5f;
+
+            float lineWidth = (outerCircleRadius - innerCircleRadius) * height;
+
+            painter.BeginPath();
+            painter.strokeColor = earthColor;
+            painter.lineWidth = lineWidth;
+            painter.Arc(changeSpace(new Vector2(0f, 0f), width, height), ((innerCircleRadius + outerCircleRadius) / 2) * height, currentYaw + 0, currentYaw + 180);
+            painter.Stroke();
+
+
+            painter.BeginPath();
+            painter.strokeColor = skyColor;
+            painter.lineWidth = lineWidth;
+            painter.Arc(changeSpace(new Vector2(0f, 0f), width, height), ((innerCircleRadius + outerCircleRadius) / 2) * height, currentYaw + 180, currentYaw + 180 + 180);
+            painter.Stroke();
+
+
+            for (int i = 0; i <= 180; i += 30)
+            {
+                painter.BeginPath();
+                painter.strokeColor = UnityEngine.Color.white;
+                painter.lineWidth = lineWidth;
+                painter.Arc(changeSpace(new Vector2(0f, 0f), width, height), ((innerCircleRadius + outerCircleRadius) / 2) * height, currentYaw + 180 + i - 1, currentYaw + 180 + i + 1);
+                painter.Stroke();
+            }
+
+            painter.BeginPath();
+            painter.strokeColor = UnityEngine.Color.white;
+            painter.lineWidth = lineWidth/2;
+            painter.Arc(changeSpace(new Vector2(0f, 0f), width, height), ((innerCircleRadius + outerCircleRadius) / 2) * height, currentYaw + 180 + 45 - 1, currentYaw + 180 + 45 + 1);
+            painter.Stroke();
+
+            painter.BeginPath();
+            painter.strokeColor = UnityEngine.Color.white;
+            painter.lineWidth = lineWidth/2;
+            painter.Arc(changeSpace(new Vector2(0f, 0f), width, height), ((innerCircleRadius + outerCircleRadius) / 2) * height, currentYaw + 180 + 90+ 45 - 1, currentYaw + 180 +90+ 45 + 1);
+            painter.Stroke();
+
+
+            for(int i = -20;i<=20;i+=10)
+            {
+                painter.BeginPath();
+                painter.strokeColor = UnityEngine.Color.white;
+                painter.lineWidth = lineWidth / 4;
+                painter.Arc(changeSpace(new Vector2(0f, 0f), width, height), ((innerCircleRadius + outerCircleRadius) / 2) * height, currentYaw + 180 + 90 + i - 1, currentYaw + 180 + 90 + i + 1);
+                painter.Stroke();
+            }
+
+            //Inner Circle
+
+
+
+            painter.BeginPath();
+            painter.Arc(changeSpace(new Vector2(0f, 0f), width, height), innerCircleRadius*height, 0, 360);
+            painter.ClosePath();
+
+            painter.fillColor = (skyColor);
+            painter.Fill();
+
+            painter.BeginPath();
+            painter.Arc(changeSpace(new Vector2(0f, 0f), width, height), innerCircleRadius * height, currentBank, 180 - currentBank);
+            painter.ClosePath();
+
+            painter.fillColor = (earthColor);
+            painter.Fill();
+
+            for (int i = 10; i <= 20; i += 10)
+            {
+                painter.BeginPath();
+                painter.MoveTo(changeSpace(new Vector2(-0.1f*i/10, 2 * innerCircleRadius * Mathf.Sin((i - currentBank) * 0.017f)), width, height));
+                mgc.DrawText(i.ToSafeString(), changeSpace(new Vector2(-0.1f * i / 10, 2 * innerCircleRadius * Mathf.Sin((i - currentBank) * 0.017f)), width, height), 8, UnityEngine.Color.white);
+                painter.LineTo(changeSpace(new Vector2(0.1f * i / 10, 2 * innerCircleRadius * Mathf.Sin((i - currentBank) * 0.017f)), width, height));
+                painter.strokeColor = UnityEngine.Color.white;
+                painter.lineWidth = lineWidth / 8;
+                painter.Stroke();
+            }
+
+
+            for (int i = -10; i >= -20; i -= 10)
+            {
+                painter.BeginPath();
+                painter.MoveTo(changeSpace(new Vector2(-0.1f * i / 10,  2 * innerCircleRadius * Mathf.Sin((i - currentBank) * 0.017f)), width, height));
+                mgc.DrawText(i.ToSafeString(), changeSpace(new Vector2(0.1f * i / 10, 2 * innerCircleRadius * Mathf.Sin((i - currentBank) * 0.017f)), width, height), 8, UnityEngine.Color.white);
+
+                painter.LineTo(changeSpace(new Vector2(0.1f * i / 10, 2 * innerCircleRadius * Mathf.Sin((i - currentBank) * 0.017f)), width, height));
+                painter.strokeColor = UnityEngine.Color.white;
+                painter.lineWidth = lineWidth / 8;
+                painter.Stroke();
+            }
+
+
+
+
+
+
+
+            // Draw T-shaped structure
+            // Stem
+            //painter.BeginPath();
+            //painter.MoveTo(new Vector2(width * 0.48f, height * 0.55f));
+            //painter.LineTo(new Vector2(width * 0.52f, height * 0.7f));
+            //painter.LineTo(new Vector2(width * 0.52f, height * 0.7f));
+            //painter.LineTo(new Vector2(width * 0.48f, height * 0.7f));
+            //painter.ClosePath();
+            //painter.fillColor = (stemColor);
+            //painter.Fill();
+
+            // Horizontal bars
+            //// Left bar
+            painter.BeginPath();
+
+            painter.MoveTo(new Vector2(width * 0.3f, height * 0.49f));
+            painter.LineTo(new Vector2(width * 0.45f, height * 0.49f));
+            painter.LineTo(new Vector2(width * 0.45f, height * 0.51f));
+            painter.LineTo(new Vector2(width * 0.3f, height * 0.51f));
+            //// Right bar
+            painter.MoveTo(new Vector2(width * 0.55f, height * 0.49f));
+            painter.LineTo(new Vector2(width * 0.7f, height * 0.49f));
+            painter.LineTo(new Vector2(width * 0.7f, height * 0.51f));
+            painter.LineTo(new Vector2(width * 0.55f, height * 0.51f));
+            painter.ClosePath();
+            painter.fillColor = (barColor);
+            painter.Fill();
+
+            //// Center dot
+            float dotRadius = width * 0.01f;
+            painter.BeginPath();
+            painter.Arc(new Vector2(width * 0.5f, height * 0.5f), dotRadius, 0, 360);
+            painter.fillColor = (barColor);
+            painter.Fill();
+
+            painter.BeginPath();
+            painter.MoveTo(changeSpace(new Vector2(0f, innerCircleRadius * 2), width, height));
+            painter.LineTo(changeSpace(new Vector2(-0.05f, innerCircleRadius * 2 - 0.1f), width, height));
+            painter.LineTo(changeSpace(new Vector2(0.05f, innerCircleRadius * 2 - 0.1f), width, height));
+            painter.ClosePath();
+            painter.fillColor = (UnityEngine.Color.magenta);
+            painter.Fill();
+
+
+
+
+
+
         }
 
 
         private void UpdateVisualState()
         {
+            MarkDirtyRepaint();
 
-        }
-        private void RotateOuterImage()
-        {
-            //Debug.Log(m_Angle);
-            // Calculate new rotation based on time
-            float rotationRemaining = m_Angle - currentRotation;
-
-            float rotationThisFrame = Mathf.Min(Mathf.Abs(rotationRemaining), rotationSpeed * Time.deltaTime);
-
-            if (Mathf.Abs(rotationRemaining) < 0.1f)
-            {
-                return;
-            }
-
-
-            if (rotationRemaining < 0)
-            {
-                rotationThisFrame *= -1;
-            }
-            currentRotation += rotationThisFrame;
-
-            //Debug.Log($"{currentRotation} {rotationThisFrame}");
-
-            // Apply the rotation
-            m_Outer.style.rotate = new Rotate(new Angle(currentRotation, AngleUnit.Degree));
-
-            // Optional: Reset rotation after 360 degrees to prevent floating-point issues over time
-            if (currentRotation >= 360f)
-            {
-                currentRotation -= 360f;
-            }
-        }
-
-
-
-        private void TranslateInnerImage()
-        {
-            Debug.Log(m_Angle);
-            // Calculate new rotation based on time
-            float translationRemaining = m_Angle - currentTranslation;
-
-            float translationThisFrame = Mathf.Min(Mathf.Abs(translationRemaining), translationSpeed * Time.deltaTime);
-
-            if (Mathf.Abs(translationRemaining) < 0.1f)
-            {
-                return;
-            }
-
-
-            if (translationRemaining < 0)
-            {
-                translationThisFrame *= -1;
-            }
-            currentTranslation += translationThisFrame;
-
-            //Debug.Log($"{currentRotation} {rotationThisFrame}");
-
-            // Apply the rotation
-            m_Inner.style.translate = new Translate(0,Length.Percent(currentTranslation));
-
-            // Optional: Reset rotation after 360 degrees to prevent floating-point issues over time
-            if (currentRotation >= 360f)
-            {
-                currentRotation -= 360f;
-            }
         }
 
         public void update(Dictionary<string, object> data)
         {
-            if (data[name] is JsonElement element)
+            // 'name' is assumed to be "attitude_instrument" 
+            // so data[name] should refer to the JSON element containing { "bank": 15, "yaw": -11 }.
+            if (data[name] is JsonElement element && element.ValueKind == JsonValueKind.Object)
             {
-                if (element.ValueKind == JsonValueKind.Number)
+                // Attempt to get "yaw"
+                if (element.TryGetProperty("yaw", out JsonElement yawElement) && yawElement.ValueKind == JsonValueKind.Number)
                 {
-                    if (element.TryGetDouble(out double doubleValue))
+                    if (yawElement.TryGetDouble(out double yawValue))
                     {
-                        m_Angle = (float)doubleValue;
+                        m_Yaw = (float)yawValue;
+                    }
+                }
+
+                // Attempt to get "bank"
+                if (element.TryGetProperty("bank", out JsonElement bankElement) && bankElement.ValueKind == JsonValueKind.Number)
+                {
+                    if (bankElement.TryGetDouble(out double bankValue))
+                    {
+                        m_Bank = (float)bankValue;
                     }
                 }
             }
+
+            UpdateVisualState();
+            //Debug.Log(m_Yaw);
+        }
+
+
+        private Vector2 rotate(Vector2 point,float rotation)
+        {
+            Vector2 result = new Vector2() ;
+
+            result.x = Mathf.Cos(rotation)*point.x + Mathf.Sin(rotation)*point.y;
+            result.y = -1*Mathf.Sin(rotation) * point.x + Mathf.Cos(rotation) * point.y;
+
+            return result;
+        }
+
+        private Vector2 changeSpace(Vector2 point,float width, float height)    
+        {
+
+            Vector2 result = new Vector2();
+            result.x = (0.5f + point.x/2) * width;
+            result.y = (0.5f - point.y/2) * height;
+            //Debug.Log(result);
+            return result;
         }
 
     }
